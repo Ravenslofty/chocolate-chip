@@ -38,8 +38,11 @@ local function enum(t)
     return t
 end
 
+---@class Proto
+local Proto
+
 -- forward declarations
-local Buf, Ins, Proto, Dump, KNum, KObj
+local Buf, Ins, Dump, KNum, KObj
 
 local MAX_REG = 200
 local MAX_UVS = 60
@@ -216,8 +219,10 @@ Buf.__index.need = function(self, size)
     end
 end
 Buf.__index.put = function(self, v)
+    assert(tonumber(v))
     self:need(1)
     local offs = self.offs
+    assert(tonumber(offs))
     self.data[offs] = v
     self.offs = offs + 1
     return offs
@@ -324,6 +329,8 @@ end
 Ins = {}
 Ins.__index = {}
 function Ins.new(op, a, b, c)
+    assert(tonumber(op))
+    assert(tonumber(b))
     assert(type(a) == "number")
     return setmetatable({
         op;
@@ -338,6 +345,7 @@ function Ins.__index:rewrite(op, a, b, c)
 end
 function Ins.__index:write(buf)
     local op, a = self[1], self[2]
+    assert(tonumber(op))
     buf:put(op)
     buf:put(a)
     local mode = BC_MODE[op]
@@ -1145,12 +1153,19 @@ function Proto.__index:op_tnew(dest, narr, nrec)
     return self:emit(BC.TNEW, dest, tabsize(narr or 0, nrec or 0))
 end
 function Proto.__index:op_tget(dest, tab, ktag, key)
-    local ins_name = 'TGET' .. ktag
-    self:emit(BC[ins_name], dest, tab, key)
+    assert(tonumber(key))
+    local ins_name = {
+        ['S'] = 'TGETS',
+    }
+    self:emit(BC[ins_name[ktag]], dest, tab, key)
 end
 function Proto.__index:op_tset(tab, ktag, key, val)
-    local ins_name = 'TSET' .. ktag
-    self:emit(BC[ins_name], val, tab, key)
+    assert(tonumber(key), "key must be convertible to number")
+    local ins_name = {
+        ['B'] = 'TSETB',
+        ['S'] = 'TSETS',
+    }
+    self:emit(BC[ins_name[ktag]], val, tab, key)
 end
 function Proto.__index:op_tsetm(base, vnum)
     local dptr = double_new(0)

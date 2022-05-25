@@ -1,15 +1,10 @@
-local bc = require "cc.bytecode"
+require("jit.opt").start(
+  "maxmcode=8192",
+  "maxtrace=2000"
+)
 
-local test = bc.Proto.new(nil, 0, 1)
-test.explret = true
-test:op_add(2, 0, 1)
-test:op_ret1(2)
-test:close_proto()
-local dump = bc.Dump.new(test, "test.lua"):pack()
+local Vr4300 = require "cc.vr4300.vr4300"
 
-local f = loadstring(dump)
-
-local ljbc = require "jit.bc"
-ljbc.dump(f)
-
-print(f(2, 2))
+local cpu = Vr4300.new("dillon-n64-tests-simpleboot/sll_simpleboot.z64")
+cpu:dillon_simpleboot()
+cpu:run()
