@@ -1280,6 +1280,7 @@ Dump = {
     BE     = 0x01;
     STRIP  = 0x02;
     FFI    = 0x04;
+    FR2    = 0x08;
     DEBUG  = false;
 }
 Dump.__index = {}
@@ -1287,7 +1288,7 @@ function Dump.new(main, name)
     local self =  setmetatable({
         main  = main;
         name  = name;
-        flags = band(main.flags, Dump.FFI);
+        flags = band(main.flags, bor(Dump.FFI, Dump.FR2));
     }, Dump)
     return self
 end

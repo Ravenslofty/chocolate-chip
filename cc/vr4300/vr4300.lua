@@ -102,15 +102,15 @@ function Vr4300:after_trace(bytecode, gpr_cache)
         end
     end
 
-    bytecode:op_move(1, 0)
-    bytecode:op_tget(0, 1, 'S', bytecode:const("run"))
+    bytecode:op_move(1 + MipsDecoder.CallPadding, 0)
+    bytecode:op_tget(0, 1 + MipsDecoder.CallPadding, 'S', bytecode:const("run"))
     bytecode:op_callt(0, 1, 1)
 
     bytecode:close_proto()
 end
 
 function Vr4300:build_trace()
-    local bytecode = bc.Proto.new(nil, 0, 4)
+    local bytecode = bc.Proto.new(MipsDecoder.IsFR2 and bc.Dump.FR2 or 0, 0, 4)
     local gpr_cache = {}
 
     io.write("-- MIPS ASM --\n")
