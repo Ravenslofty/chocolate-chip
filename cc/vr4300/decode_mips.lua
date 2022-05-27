@@ -59,6 +59,22 @@ MipsDecoder = {
     REG_LO = 0,
     REG_HI = 1,
 }
+do
+    local ljbc = require "jit.bc"
+    local function f(x) end
+    local function g()
+        f(1)
+    end
+    -- LJ_FR2 => 0002    KSHORT   2   1
+    -- !LJ_FR2 => 0002    KSHORT   1   1
+    local ans = {
+        ["0002    KSHORT   2   1\n"] = true,
+        ["0002    KSHORT   1   1\n"] = false,
+    }
+    MipsDecoder.IsFR2 = ans[ljbc.line(g, 2)];
+end
+assert(MipsDecoder.IsFR2 ~= nil)
+MipsDecoder.CallPadding = MipsDecoder.IsFR2 and 1 or 0
 
 ---@type integer gpr
 ---@return integer
